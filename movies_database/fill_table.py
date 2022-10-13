@@ -40,7 +40,7 @@ with contextlib.closing(psycopg2.connect(**dsn)) as conn, conn.cursor() as cur:
     person_film_work_data = []
     roles = ['actor', 'producer', 'director']
 
-    cur.execute('SELECT id FROM film_work')
+    cur.execute('SELECT id FROM filmwork')
     film_works_ids = [data[0] for data in cur.fetchall()]
 
     for film_work_id in film_works_ids:
@@ -49,6 +49,6 @@ with contextlib.closing(psycopg2.connect(**dsn)) as conn, conn.cursor() as cur:
             person_film_work_data.append((str(uuid.uuid4()), film_work_id,
                                           person_id, role, now))
 
-    query = 'INSERT INTO person_film_work (id, film_work_id, person_id, role, created) VALUES (%s, %s, %s, %s, %s)'
+    query = 'INSERT INTO person_filmwork (id, filmwork_id, person_id, role, created) VALUES (%s, %s, %s, %s, %s)'
     execute_batch(cur, query, person_film_work_data, page_size=PAGE_SIZE)
     conn.commit()

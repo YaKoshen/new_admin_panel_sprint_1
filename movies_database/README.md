@@ -6,6 +6,6 @@
 Состав файлов:
 - `docker_postgres_create.bat` создаёт докер контейнер с Postgresql (Windows)
 - `docker_postgres_run.bat` запускает созданный докер контейнер с Postgresql (Windows)
-- `fill_table.py` заполненяет таблицы `content.person` и `content.person_film_work`
-- `film_work_data.sql` заполняет таблицу `content.film_work`
+- `fill_table.py` заполненяет таблицы `content.person` и `content.person_filmwork`
+- `filmwork_data.sql` заполняет таблицу `content.filmwork`
 - `postgres_psql.sh` запуск команды `psql` с необходимыми парраметрами (Linux)
