@@ -10,6 +10,7 @@ load_dotenv()
 include(
     'components/applications.py',
     'components/database.py',
+    'components/logging.py',
 )
 
 
