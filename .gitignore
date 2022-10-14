@@ -135,3 +135,6 @@ dmypy.json
 
 # Movies license files
 /movies
+
+# Postgres volume
+/movies_database/volumes
