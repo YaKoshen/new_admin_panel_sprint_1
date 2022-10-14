@@ -129,3 +129,9 @@ dmypy.json
 .pyre/
 
 .python-version
+
+# VS Code
+.vscode
+
+# Movies license files
+/movies
