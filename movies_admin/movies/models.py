@@ -10,8 +10,9 @@ class CharFieldMaxLength:
     """Стандартные размеры строк для полей."""
 
     BIG = 255
-    NORMAL = 63
-    SMALL = 7
+    MEDIUM = 124
+    SMALL = 63
+    MICRO = 7
 
 
 class TimeStampedMixin(models.Model):
@@ -75,13 +76,14 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     )
     type = models.TextField(
         _('Type'),
-        max_length=CharFieldMaxLength.NORMAL,
+        max_length=CharFieldMaxLength.SMALL,
         choices=AvalibleGenre.choices,
         null=True,
         blank=True,
     )
     file_path = models.FileField(
         _('File'),
+        max_length=CharFieldMaxLength.MEDIUM,
         blank=True,
         null=True,
         upload_to='movies/',
@@ -133,8 +135,9 @@ class Person(UUIDMixin, TimeStampedMixin):
     )
     gender = models.TextField(
         _('Gender'),
-        max_length=CharFieldMaxLength.SMALL,
+        max_length=CharFieldMaxLength.MICRO,
         choices=Gender.choices,
+        blank=True,
         null=True,
     )
 
