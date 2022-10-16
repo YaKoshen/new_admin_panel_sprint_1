@@ -1,3 +1,4 @@
+"""Скрипт для загрзки даннных их SQLite в Postgres."""
 from tabulate import tabulate
 
 from db_connections.postgres import postgres_conn_context
@@ -5,7 +6,18 @@ from db_connections.sqlite import sqlite_conn_context
 from settings.settings import Settings
 from structures.common import TablePair, Timer, sqlite_col, tables
 
+
 def generate_pg_insert_query(table: TablePair, sqlite_rows: list()) -> tuple():
+    """Генерипует запрос и даные для записи в Postgres.
+
+    Args:
+        table: Имя таблицы.
+        sqlite_rows: Массив строк из SQLite.
+
+    Returns:
+        Строку запроса в Postgres для вставки и список значений для колонок из SQLite.
+
+    """
     sqlite_columns = []
     postgres_columns = []
 
@@ -30,6 +42,7 @@ def generate_pg_insert_query(table: TablePair, sqlite_rows: list()) -> tuple():
     return (query, data)
 
 if __name__ == '__main__':
+    """Работаем с подключениями к Postgres и SQLite через контестные менеджеры."""
     with postgres_conn_context() as pg_conn, sqlite_conn_context() as sqlite_conn:
         print(f'Start to copy data drom SQLite to Postgres\n')
 
@@ -47,11 +60,10 @@ if __name__ == '__main__':
             table.postgres_length = pg_curs.fetchone()[0]
 
             length_data.append((current_step+1, table.sqlite, table.postgres, table.sqlite_length,
-                table.postgres_length, table.sqlite_length==table.postgres_length))
+                table.postgres_length, table.sqlite_length == table.postgres_length))
 
         print(tabulate(length_data, headers=('#', 'SQLite', 'Postgres', 'SQLite', 'Postgres', 'Equal')))
-        print()
-        print(f'Length of tables got for {timer.get_value()}')
+        print(f'\nLength of tables got for {timer.get_value()}')
 
         ans = input('Do you whant to delete data from Postgres tables? (Y/n) ')
         if ans.strip().lower() == 'y':
@@ -86,4 +98,4 @@ if __name__ == '__main__':
 
         print(f'Copied all data from SQLite to Postgres for {timer.get_value()}')
 
-    print(f'All works done')
+    print('All works done')
