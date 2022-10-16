@@ -1,11 +1,9 @@
-import psycopg2
-
 from contextlib import contextmanager
-from psycopg2.extensions import connection
+
+import psycopg2
 from psycopg2.extras import DictCursor
 
 from settings.settings import Settings
-
 
 CONNECTION_CONFIG = {
     'dbname': Settings().pg_dbname,
@@ -17,10 +15,7 @@ CONNECTION_CONFIG = {
 
 @contextmanager
 def postgres_conn_context():
-    conn = psycopg2.connect(
-        **CONNECTION_CONFIG,
-        cursor_factory=DictCursor
-    )
+    conn = psycopg2.connect(**CONNECTION_CONFIG, cursor_factory=DictCursor)
     yield conn
 
     conn.close()

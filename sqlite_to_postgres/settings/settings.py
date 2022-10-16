@@ -10,6 +10,8 @@ class Settings(BaseSettings):
 
     sqlite_db_path: str
 
+    chunk_size: int
+
     class Config:
         env_file = '.env'
         env_file_encoding = 'utf-8'
