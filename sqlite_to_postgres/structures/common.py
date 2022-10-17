@@ -40,6 +40,20 @@ def sqlite_col(postgres_column_name: str) -> str:
     return postgres_column_name
 
 
+sqlite_postgres_columns = {
+    'created_at': 'created',
+    'updated_at': 'modified',
+    'film_work_id': 'filmwork_id',
+}
+
+
+def postgres_col(sqlite_column_name: str) -> str:
+    if sqlite_column_name in sqlite_postgres_columns:
+        return sqlite_postgres_columns[sqlite_column_name]
+
+    return sqlite_column_name
+
+
 class Timer:
     start_time = None
 
