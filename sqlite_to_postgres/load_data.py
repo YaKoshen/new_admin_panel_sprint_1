@@ -5,6 +5,7 @@ from db_connections.postgres import postgres_conn_context
 from db_connections.sqlite import sqlite_conn_context
 from settings.settings import Settings
 from structures.common import TablePair, Timer, sqlite_col, tables
+from utils.logger import logger
 
 
 def generate_pg_insert_query(table: TablePair, sqlite_rows: list()) -> tuple():
@@ -44,12 +45,12 @@ def generate_pg_insert_query(table: TablePair, sqlite_rows: list()) -> tuple():
 if __name__ == '__main__':
     """Работаем с подключениями к Postgres и SQLite через контестные менеджеры."""
     with postgres_conn_context() as pg_conn, sqlite_conn_context() as sqlite_conn:
-        print(f'Start to copy data drom SQLite to Postgres\n')
+        logger.info(f'Start to copy data drom SQLite to Postgres\n')
 
         pg_curs = pg_conn.cursor()
         sqlite_curs = sqlite_conn.cursor()
 
-        print('Length of tables')
+        logger.info('Length of tables')
         timer = Timer()
         length_data = []
         for current_step, table in enumerate(tables):
@@ -62,8 +63,8 @@ if __name__ == '__main__':
             length_data.append((current_step+1, table.sqlite, table.postgres, table.sqlite_length,
                 table.postgres_length, table.sqlite_length == table.postgres_length))
 
-        print(tabulate(length_data, headers=('#', 'SQLite', 'Postgres', 'SQLite', 'Postgres', 'Equal')))
-        print(f'\nLength of tables got for {timer.get_value()}')
+        logger.info('\n'+tabulate(length_data, headers=('#', 'SQLite', 'Postgres', 'SQLite', 'Postgres', 'Equal')))
+        logger.info(f'Length of tables got for {timer.get_value()}')
 
         ans = input('Do you whant to delete data from Postgres tables? (Y/n) ')
         if ans.strip().lower() == 'y':
@@ -73,29 +74,25 @@ if __name__ == '__main__':
                     timer.start()
                     pg_curs.execute(f'TRUNCATE TABLE {table.postgres} CASCADE')
                     pg_conn.commit()
-                    print(f'{table.postgres} erased for {timer.get_value()}')
+                    logger.info(f'{table.postgres} erased for {timer.get_value()}')
         else:
-            print('Skip erasing data')
-        print('')
+            logger.info('Skip erasing data')
+        logger.info('')
 
-        print(f'Copy data from SQLite to Postgres with chunk size = {Settings().chunk_size}')
+        logger.info(f'Copy data from SQLite to Postgres with chunk size = {Settings().chunk_size}')
         timer.start()
         for current_step, table in enumerate(tables):
-            print(f'Copy data from {table.sqlite} (SQLite) to {table.postgres} (Postgres)')
+            logger.info(f'Copy data from {table.sqlite} (SQLite) to {table.postgres} (Postgres)')
             sqlite_curs.execute(f'SELECT * FROM {table.sqlite}')
             copied_rows = 0
-            while True:
-                sqlite_chunk = sqlite_curs.fetchmany(Settings().chunk_size)
-                if not sqlite_chunk:
-                    break
-
+            while sqlite_chunk := sqlite_curs.fetchmany(Settings().chunk_size):
                 query, data = generate_pg_insert_query(table, sqlite_chunk)
                 pg_curs.execute(query, data)
                 pg_conn.commit()
 
                 copied_rows += len(sqlite_chunk)
-                print(f'Copied {copied_rows}/{table.sqlite_length} rows')
+                logger.info(f'Copied {copied_rows}/{table.sqlite_length} rows')
 
-        print(f'Copied all data from SQLite to Postgres for {timer.get_value()}')
+        logger.info(f'Copied all data from SQLite to Postgres for {timer.get_value()}')
 
-    print('All works done')
+    logger.info('All works done')
