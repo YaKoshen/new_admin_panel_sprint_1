@@ -128,4 +128,5 @@ CREATE extension IF NOT EXISTS "uuid-ossp";
 -- Indexes
 
 CREATE INDEX IF NOT exists filmwork_creation_date_idx ON content.filmwork(creation_date);
-CREATE UNIQUE INDEX IF NOT exists filmwork_person_idx ON content.person_filmwork (filmwork_id, person_id);
+CREATE UNIQUE INDEX IF NOT exists filmwork_person_idx ON content.person_filmwork (filmwork_id, person_id, role_id);
+CREATE UNIQUE INDEX IF NOT exists genre_filmwork_idx ON content.genre_filmwork (filmwork_id, genre_id);
