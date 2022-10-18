@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-13 23:25+0000\n"
+"POT-Creation-Date: 2022-10-18 09:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,126 +18,138 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: movies/admin.py:8
+#: movies/admin.py:12
 msgid "Рейтинг"
 msgstr "Rating"
 
-#: movies/apps.py:8
+#: movies/apps.py:11
 msgid "Movies"
 msgstr ""
 
-#: movies/models.py:9 movies/models.py:56 movies/models.py:83
+#: movies/models.py:21 movies/models.py:104 movies/models.py:153
 msgid "Сreated"
 msgstr ""
 
-#: movies/models.py:10
+#: movies/models.py:22
 msgid "Modified"
 msgstr ""
 
-#: movies/models.py:24
+#: movies/models.py:44
 msgid "Name"
 msgstr ""
 
-#: movies/models.py:25 movies/models.py:39
+#: movies/models.py:45 movies/models.py:65
 msgid "Description"
 msgstr ""
 
-#: movies/models.py:29
+#: movies/models.py:51
 msgid "Жанр"
 msgstr "Genre"
 
-#: movies/models.py:30
+#: movies/models.py:52
 msgid "Жанры"
 msgstr "Genres"
 
-#: movies/models.py:35
+#: movies/models.py:61
 msgid "Movie"
 msgstr ""
 
-#: movies/models.py:36
+#: movies/models.py:62
 msgid "TV show"
 msgstr ""
 
-#: movies/models.py:38
+#: movies/models.py:64
 msgid "Title"
 msgstr ""
 
-#: movies/models.py:40
+#: movies/models.py:66
 msgid "Creation date"
 msgstr ""
 
-#: movies/models.py:41
+#: movies/models.py:68
 msgid "Rating"
 msgstr ""
 
-#: movies/models.py:44
+#: movies/models.py:74
 msgid "Type"
 msgstr ""
 
-#: movies/models.py:45
+#: movies/models.py:80
 msgid "File"
 msgstr ""
 
-#: movies/models.py:49
+#: movies/models.py:91
 msgid "Кинопроизведение"
 msgstr "Filmwork"
 
-#: movies/models.py:50
+#: movies/models.py:92
 msgid "Кинопроизведения"
 msgstr "Filmworks"
 
-#: movies/models.py:54 movies/models.py:80
+#: movies/models.py:100 movies/models.py:150
 msgid "Filmwork"
 msgstr ""
 
-#: movies/models.py:55
+#: movies/models.py:103
 msgid "Genre"
 msgstr ""
 
-#: movies/models.py:60
+#: movies/models.py:110
 msgid "Связь Жанр - Кинопроизведение"
 msgstr "Communication Genre - Filmwork"
 
-#: movies/models.py:61
+#: movies/models.py:111
 msgid "Связи Жанр - Кинопроизведение"
 msgstr "Communications Genre - Filmwork"
 
-#: movies/models.py:65
+#: movies/models.py:120
 msgid "Male"
 msgstr ""
 
-#: movies/models.py:66
+#: movies/models.py:121
 msgid "Female"
 msgstr ""
 
-#: movies/models.py:70
+#: movies/models.py:123
 msgid "Full name"
 msgstr ""
 
-#: movies/models.py:71
+#: movies/models.py:125
 msgid "Gender"
 msgstr ""
 
-#: movies/models.py:75
+#: movies/models.py:136
 msgid "Человек"
 msgstr "Person"
 
-#: movies/models.py:76
+#: movies/models.py:137
 msgid "Люди"
 msgstr "Persons"
 
-#: movies/models.py:81
+#: movies/models.py:146
+msgid "Actor"
+msgstr ""
+
+#: movies/models.py:147
+msgid "Writer"
+msgstr ""
+
+#: movies/models.py:148
+msgid "Director"
+msgstr ""
+
+#: movies/models.py:151
 msgid "Person"
 msgstr ""
 
-#: movies/models.py:82
+#: movies/models.py:152
 msgid "Role"
 msgstr ""
 
-#: movies/models.py:87
+#: movies/models.py:159
 msgid "Связь Человек - Кинопроизведение"
 msgstr "Communication Persons - Filmwork"
 
-#: movies/models.py:88
+#: movies/models.py:160
 msgid "Связи Человек - Кинопроизведение"
 msgstr "Communications Persons - Filmwork"

@@ -63,11 +63,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
 
     title = models.CharField(_('Title'), max_length=CharFieldMaxLength.BIG)
     description = models.TextField(_('Description'), null=True, blank=True)
-    creation_date = models.DateTimeField(
-        _('Creation date'),
-        null=True,
-        blank=True,
-    )
+    creation_date = models.DateTimeField(_('Creation date'), null=True, blank=True)
     rating = models.FloatField(
         _('Rating'),
         null=True,
@@ -81,8 +77,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         null=True,
         blank=True,
     )
-    file_path = models.FileField(
-        _('File'),
+    file_path = models.FileField(_('File'),
         max_length=CharFieldMaxLength.MEDIUM,
         blank=True,
         null=True,
@@ -96,6 +91,10 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         verbose_name = _('Кинопроизведение')
         verbose_name_plural = _('Кинопроизведения')
 
+        indexes = (
+            models.Index(fields=['creation_date']),
+        )
+
 
 class GenreFilmwork(UUIDMixin):
     """Связь Жанр - Кинопроизведение."""
@@ -105,11 +104,7 @@ class GenreFilmwork(UUIDMixin):
         verbose_name=_('Filmwork'),
         on_delete=models.CASCADE,
     )
-    genre = models.ForeignKey(
-        Genre,
-        verbose_name=_('Genre'),
-        on_delete=models.CASCADE,
-    )
+    genre = models.ForeignKey(Genre, verbose_name=_('Genre'), on_delete=models.CASCADE)
     created = models.DateTimeField(_('Сreated'), auto_now_add=True)
 
     class Meta:
@@ -129,10 +124,7 @@ class Person(UUIDMixin, TimeStampedMixin):
         MALE = 'male', _('Male')
         FEMALE = 'female', _('Female')
 
-    full_name = models.CharField(
-        _('Full name'),
-        max_length=CharFieldMaxLength.BIG,
-    )
+    full_name = models.CharField(_('Full name'), max_length=CharFieldMaxLength.BIG)
     gender = models.TextField(
         _('Gender'),
         max_length=CharFieldMaxLength.MICRO,
@@ -152,17 +144,16 @@ class Person(UUIDMixin, TimeStampedMixin):
 class PersonFilmwork(UUIDMixin):
     """Связь Человек - Кинопроизведение."""
 
-    filmwork = models.ForeignKey(
-        Filmwork,
-        verbose_name=_('Filmwork'),
-        on_delete=models.CASCADE,
-    )
-    person = models.ForeignKey(
-        Person,
-        verbose_name=_('Person'),
-        on_delete=models.CASCADE,
-    )
-    role = models.TextField(_('Role'), null=True, blank=True)
+    class RoleType(models.TextChoices):
+        """Доступные должности для Человека."""
+
+        ACTOR = 'actor', _('Actor')
+        WRITER = 'writer', _('Writer')
+        DIRECTOR = 'director', _('Director')
+
+    filmwork = models.ForeignKey(Filmwork, verbose_name=_('Filmwork'), on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, verbose_name=_('Person'), on_delete=models.CASCADE)
+    role = models.TextField(_('Role'), choices=RoleType.choices, null=True, blank=True)
     created = models.DateTimeField(_('Сreated'), auto_now_add=True)
 
     class Meta:
@@ -171,3 +162,5 @@ class PersonFilmwork(UUIDMixin):
         db_table = "content\".\"person_filmwork"
         verbose_name = _('Связь Человек - Кинопроизведение')
         verbose_name_plural = _('Связи Человек - Кинопроизведение')
+
+        unique_together = ('filmwork', 'person', 'role')
