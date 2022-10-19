@@ -1,75 +1,58 @@
 """Скрипт для загрзки даннных их SQLite в Postgres."""
+from sqlite3 import Connection as SQLiteConnection
+
+from psycopg2.extensions import connection as postgres_coonnection
 from tabulate import tabulate
 
 from db_connections.postgres import postgres_conn_context
 from db_connections.sqlite import sqlite_conn_context
+from db_controllers.postgres import PostgresController
+from db_controllers.sqlite import SQLiteController
 from settings.settings import Settings
-from structures.common import TablePair, Timer, sqlite_col, tables
+from structures.common import Timer, tables
 from utils.logger import logger
 
+timer = Timer()
 
-def generate_pg_insert_query(table: TablePair, sqlite_rows: list()) -> tuple():
-    """Генерипует запрос и даные для записи в Postgres.
 
-    Args:
-        table: Имя таблицы.
-        sqlite_rows: Массив строк из SQLite.
+def show_table_sizes(pg_connection: postgres_coonnection, sqlite_connection: SQLiteConnection) -> None:
+    """Вывод в логи таблицы с размерами таблиц SQLite и Postgres.
 
-    Returns:
-        Строку запроса в Postgres для вставки и список значений для колонок из SQLite.
-
+    Parameters:
+        pg_connection: Подключение к Postgres
+        sqlite_connection: Подключение к SQLite
     """
-    sqlite_columns = []
-    postgres_columns = []
+    logger.info('Length of tables')
+    length_data = []
+    timer.start()
+    for current_step, table in enumerate(tables):
+        sqlite_curs.execute(f'SELECT COUNT(*) AS count FROM {table.sqlite}')
+        table.sqlite_length = dict(sqlite_curs.fetchone()).get('count')
 
-    sqlite_keys = dict(sqlite_rows[0]).keys()
-    for postgres_column in table.postgres_columns:
-        sqlite_cloumn = sqlite_col(postgres_column)
-        if sqlite_cloumn in sqlite_keys:
-            sqlite_columns.append(sqlite_cloumn)
-            postgres_columns.append(postgres_column)
+        pg_curs.execute(f'SELECT COUNT(*) FROM {table.postgres}')
+        table.postgres_length = pg_curs.fetchone()[0]
 
-    data_template = '('+','.join('%s' for _ in postgres_columns)+'), '
-    query = f'INSERT INTO {table.postgres} ({", ".join(postgres_columns)}) VALUES '
+        length_data.append((current_step+1, table.sqlite, table.postgres, table.sqlite_length, table.postgres_length,
+                            table.sqlite_length == table.postgres_length))
 
-    data = []
-    for sqlite_row in sqlite_rows:
-        query += data_template
-        for sqlite_cloumn in sqlite_columns:
-            data.append(dict(sqlite_row).get(sqlite_cloumn))
-    query = query[:-2]
-    query += ' ON CONFLICT(id) DO NOTHING'
+    logger.info('\n'+tabulate(length_data, headers=('#', 'SQLite', 'Postgres', 'SQLite', 'Postgres', 'Equal')))
+    logger.info(f'Length of tables got for {timer.get_value()}')
 
-    return (query, data)
 
 if __name__ == '__main__':
-    """Работаем с подключениями к Postgres и SQLite через контестные менеджеры."""
+    # Работаем с подключениями к Postgres и SQLite через контестные менеджеры.
     with postgres_conn_context() as pg_conn, sqlite_conn_context() as sqlite_conn:
-        logger.info(f'Start to copy data drom SQLite to Postgres\n')
+        logger.info('Start to copy data from SQLite to Postgres\n')
 
         pg_curs = pg_conn.cursor()
         sqlite_curs = sqlite_conn.cursor()
 
-        logger.info('Length of tables')
-        timer = Timer()
-        length_data = []
-        for current_step, table in enumerate(tables):
-            sqlite_curs.execute(f'SELECT COUNT(*) AS count FROM {table.sqlite}')
-            table.sqlite_length = dict(sqlite_curs.fetchone()).get('count')
+        show_table_sizes(pg_conn, sqlite_conn)
 
-            pg_curs.execute(f'SELECT COUNT(*) FROM {table.postgres}')
-            table.postgres_length = pg_curs.fetchone()[0]
-
-            length_data.append((current_step+1, table.sqlite, table.postgres, table.sqlite_length,
-                table.postgres_length, table.sqlite_length == table.postgres_length))
-
-        logger.info('\n'+tabulate(length_data, headers=('#', 'SQLite', 'Postgres', 'SQLite', 'Postgres', 'Equal')))
-        logger.info(f'Length of tables got for {timer.get_value()}')
-
-        ans = input('Do you whant to delete data from Postgres tables? (Y/n) ')
+        ans = input('Do you whant to delete data from Postgres tables? [Y/n] ')
         if ans.strip().lower() == 'y':
             for table in tables:
-                ans = input(f'Do you whant to delete data from {table.postgres}? (Y/n) ')
+                ans = input(f'Do you whant to delete data from {table.postgres}? [Y/n] ')
                 if ans.strip().lower() == 'y':
                     timer.start()
                     pg_curs.execute(f'TRUNCATE TABLE {table.postgres} CASCADE')
@@ -81,15 +64,19 @@ if __name__ == '__main__':
 
         logger.info(f'Copy data from SQLite to Postgres with chunk size = {Settings().chunk_size}')
         timer.start()
+
+        pg_ctrl = PostgresController(pg_conn)
+        sqlite_ctrl = SQLiteController(sqlite_conn)
+
+        tables_count = len(tables)
         for current_step, table in enumerate(tables):
-            logger.info(f'Copy data from {table.sqlite} (SQLite) to {table.postgres} (Postgres)')
-            sqlite_curs.execute(f'SELECT * FROM {table.sqlite}')
+            logger.info(f'Step {current_step + 1}/{tables_count}.')
+            logger.info(f'Copy from {table.sqlite}(SQLite) to {table.postgres}(Postgres)')
+
+            sqlite_curs = sqlite_ctrl.extract(table.sqlite)
             copied_rows = 0
             while sqlite_chunk := sqlite_curs.fetchmany(Settings().chunk_size):
-                query, data = generate_pg_insert_query(table, sqlite_chunk)
-                pg_curs.execute(query, data)
-                pg_conn.commit()
-
+                pg_ctrl.insert(sqlite_chunk, table.postgres)
                 copied_rows += len(sqlite_chunk)
                 logger.info(f'Copied {copied_rows}/{table.sqlite_length} rows')
 

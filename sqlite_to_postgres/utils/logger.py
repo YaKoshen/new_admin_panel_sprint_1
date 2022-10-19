@@ -1,6 +1,5 @@
 import logging
 
-
 logger = logging.getLogger('load_data_logger')
 logger.setLevel(logging.DEBUG)
 

@@ -1,10 +1,11 @@
-import pytest
 import datetime
+
+import pytest
 
 from db_connections.postgres import postgres_conn_context
 from db_connections.sqlite import sqlite_conn_context
-from structures.common import tables, postgres_col, sqlite_col
 from settings.settings import Settings
+from structures.common import postgres_col, tables
 
 
 def test_rows_count():
